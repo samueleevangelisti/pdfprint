@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" type="text/css" href="/assets/css/main.css">
+  <script type="text/javascript" src="/assets/js/utils.js"></script>
+  <script type="text/javascript" src="/assets/js/logUtils.js"></script>
+  <script type="text/javascript" src="/assets/js/convertUtils.js"></script>
+  <script type="text/javascript" src="/assets/js/ajaxUtils.js"></script>
+  <script type="text/javascript" src="/assets/js/uiUtils.js"></script>
+  <script type="text/javascript" src="/assets/js/globals.js"></script>
+  <script type="text/javascript" src="/assets/js/uis.js"></script>
+  <script type="text/javascript" src="/assets/js/handlers.js"></script>
+  <script type="text/javascript" src="/assets/js/main.js"></script>
+  <title>pdfprint</title>
+</head>
+<body>
+  <div>
+    <input id="file-input" class="margin-right" name="file" type="file" accept="application/pdf" multiple onchange="handlers.fileInputOnChange(event)">
+    <button id="crea-fronte-retro-button" class="margin-right" onclick="handlers.creaFronteRetroButtonOnClick(event)">Crea fronte/retro</button>
+    <button onclick="handlers.chiudiButtonOnClick(event)">Chiudi</button>
+  </div>
+  <div class="margin-top">
+    <ul id="file-ul"></ul>
+  </div>
+</body>
+</html>
