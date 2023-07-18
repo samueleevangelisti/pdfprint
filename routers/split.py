@@ -1,18 +1,18 @@
 '''
-load.py
+split.py
 '''
 import json
-import base64
 from io import BytesIO
 import flask
 from pypdf import PdfReader
 from pypdf import PdfWriter
 
 from utils import logs
+from utils import converts
 
 
 
-router = flask.Blueprint('load', __name__)
+router = flask.Blueprint('split', __name__)
 
 
 
@@ -21,12 +21,12 @@ def post_file_list():
     '''
     post_file_list()
     '''
-    logs.debug(f"(load.post_file_list) flask.request.data: {flask.request.data[:300]}...")
+    logs.debug('(split.post_file_list) flask.request.data: ...')
     data_list = json.loads(flask.request.data.decode())
     pdf_writer_fronte = PdfWriter()
     pdf_writer_retro = PdfWriter()
     for data in data_list:
-        pdf_reader = PdfReader(BytesIO(base64.b64decode(data.encode())))
+        pdf_reader = PdfReader(BytesIO(converts.base64_to_byte(data)))
         for i in range(0, len(pdf_reader.pages), 2):
             pdf_writer_fronte.add_page(pdf_reader.pages[i])
         for i in range(1, len(pdf_reader.pages), 2):
@@ -43,7 +43,7 @@ def post_file_list():
     return {
         'success': True,
         'data': {
-            'fronte': base64.b64encode(bytes_io_fronte.read()).decode(),
-            'retro': base64.b64encode(bytes_io_retro.read()).decode()
+            'fronte': converts.byte_to_base64(bytes_io_fronte.read()),
+            'retro': converts.byte_to_base64(bytes_io_retro.read())
         }
     }

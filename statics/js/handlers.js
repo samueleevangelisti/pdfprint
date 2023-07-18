@@ -9,32 +9,59 @@ var handlers = {
     }));
     globals.fileForm.enable();
   },
-  creaFronteRetroButtonOnClick: (event) => {
-    logUtils.debug('(handlers.caricaButtonOnClick)', event);
+  creaUnicoPdfButtonOnClick: (event) => {
+    logUtils.debug('(handlers.creaUnicoPdfButtonOnClick)', event);
     Promise.all(globals.fileArr.map((file) => {
       return convertUtils.fileToBase64(file);
     }))
       .then((responseArr) => {
-        logUtils.debug('(handlers.caricaButtonOnClick)', responseArr);
-        ajaxUtils.post('/load', responseArr)
+        logUtils.debug('(handlers.creaUnicoPdfButtonOnClick)', responseArr);
+        ajaxUtils.post('/merge', responseArr)
           .then((response) => {
             if(response.success) {
-              logUtils.debug('(handlers.caricaButtonOnClick)', response);
-              file_name = (globals.fileArr.length == 1 ? globals.fileArr[0].name : `${new Date().toISOString().slice(0, 19)}.pdf`);
-              convertUtils.base64ToPdf(response.data.fronte, `fronte-${file_name}`);
-              convertUtils.base64ToPdf(response.data.retro, `retro-${file_name}`);
+              logUtils.debug('(handlers.creaUnicoPdfButtonOnClick)', response);
+              convertUtils.base64ToPdf(response.data, `pdf-${(globals.fileArr.length == 1 ? globals.fileArr[0].name : `${new Date().toISOString().slice(0, 19)}.pdf`)}`);
             } else {
-              logUtils.error('(handlers.caricaButtonOnClick)', response);
+              logUtils.error('(handlers.creaUnicoPdfButtonOnClick)', response);
               alert(JSON.stringify(response, null, 2));
             }
           })
           .catch((error) => {
-            logUtils.debug('(handlers.caricaButtonOnClick)', error);
+            logUtils.error('(handlers.creaUnicoPdfButtonOnClick)', error);
             alert(JSON.stringify(error, null, 2));
           });
       })
       .catch((error) => {
-        logUtils.error('(handlers.caricaButtonOnClick)', error);
+        logUtils.error('(handlers.creaUnicoPdfButtonOnClick)', error);
+        alert(JSON.stringify(error, null, 2));
+      });
+  },
+  creaFronteRetroButtonOnClick: (event) => {
+    logUtils.debug('(handlers.creaFronteRetroButtonOnClick)', event);
+    Promise.all(globals.fileArr.map((file) => {
+      return convertUtils.fileToBase64(file);
+    }))
+      .then((responseArr) => {
+        logUtils.debug('(handlers.creaFronteRetroButtonOnClick)', responseArr);
+        ajaxUtils.post('/split', responseArr)
+          .then((response) => {
+            if(response.success) {
+              logUtils.debug('(handlers.creaFronteRetroButtonOnClick)', response);
+              file_name = (globals.fileArr.length == 1 ? globals.fileArr[0].name : `${new Date().toISOString().slice(0, 19)}.pdf`);
+              convertUtils.base64ToPdf(response.data.fronte, `fronte-${file_name}`);
+              convertUtils.base64ToPdf(response.data.retro, `retro-${file_name}`);
+            } else {
+              logUtils.error('(handlers.creaFronteRetroButtonOnClick)', response);
+              alert(JSON.stringify(response, null, 2));
+            }
+          })
+          .catch((error) => {
+            logUtils.debug('(handlers.creaFronteRetroButtonOnClick)', error);
+            alert(JSON.stringify(error, null, 2));
+          });
+      })
+      .catch((error) => {
+        logUtils.error('(handlers.creaFronteRetroButtonOnClick)', error);
         alert(JSON.stringify(error, null, 2));
       });
   },

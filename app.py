@@ -7,7 +7,8 @@ import webbrowser
 import flask
 
 from utils import logs
-from routers import load
+from routers import merge
+from routers import split
 from routers import shutdown
 
 
@@ -38,7 +39,8 @@ def get_asset(path):
 
 
 
-app.register_blueprint(load.router, url_prefix='/load')
+app.register_blueprint(merge.router, url_prefix='/merge')
+app.register_blueprint(split.router, url_prefix='/split')
 app.register_blueprint(shutdown.router, url_prefix='/shutdown')
 
 
