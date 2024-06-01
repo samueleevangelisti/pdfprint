@@ -78,7 +78,7 @@ var handlers = {
         }
       })
       .catch((error) => {
-        logUtils.debug('(handlers.chiudiButtonOnClick)', error);
+        logUtils.error('(handlers.chiudiButtonOnClick)', error);
         alert(JSON.stringify(error, null, 2));
       });
   },

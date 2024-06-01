@@ -1,12 +1,12 @@
 var uis = {
   createLiElement: (file, index) => {
-    return elementFromConfigObj({
+    return uiUtils.elementFromConfigObj({
       tag: 'li',
       styleObj: {
         marginBottom: '5pt'
       },
       childElementArr: [
-        elementFromConfigObj({
+        uiUtils.elementFromConfigObj({
           tag: 'input',
           classArr: [
             'margin-right'
@@ -22,7 +22,7 @@ var uis = {
             }
           }
         }),
-        elementFromConfigObj({
+        uiUtils.elementFromConfigObj({
           tag: 'button',
           classArr: [
             'margin-right'
@@ -34,7 +34,7 @@ var uis = {
             }
           }
         }),
-        elementFromConfigObj({
+        uiUtils.elementFromConfigObj({
           tag: 'button',
           classArr: [
             'margin-right'
@@ -46,7 +46,7 @@ var uis = {
             }
           }
         }),
-        elementFromConfigObj({
+        uiUtils.elementFromConfigObj({
           tag: 'button',
           classArr: [
             'margin-right'
@@ -58,7 +58,7 @@ var uis = {
             }
           }
         }),
-        elementFromConfigObj({
+        uiUtils.elementFromConfigObj({
           tag: 'span',
           innerHTML: file.name
         })
