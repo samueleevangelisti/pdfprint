@@ -29,12 +29,12 @@ def get_index():
 
 
 
-@app.route('/assets/<path:path>', methods=['GET'])
-def get_asset(path):
+@app.route('/statics/<path:path>', methods=['GET'])
+def get_statics(path):
     '''
-    get_asset(path)
+    get_statics(path)
     '''
-    logs.debug(f"(app.get_asset) path: {path}")
+    logs.debug(f"(app.get_statics) path: {path}")
     return flask.send_from_directory('statics', path)
 
 

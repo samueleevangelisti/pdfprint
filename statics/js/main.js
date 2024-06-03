@@ -5,5 +5,5 @@ window.addEventListener('load', (event) => {
     'crea-unico-pdf-button',
     'crea-fronte-retro-button'
   ]);
-  globals.fileArrUl = uiUtils.Ul.fromElementId('file-ul');
+  globals.fileArrUl = uiUtils.Ul.fromElementId('file-ol');
 });

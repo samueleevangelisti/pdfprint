@@ -3,27 +3,81 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" type="text/css" href="/assets/css/main.css">
-  <script type="text/javascript" src="/assets/js/configs/logUtils/configs.js"></script>
-  <script type="text/javascript" src="/assets/js/logUtils.js"></script>
-  <script type="text/javascript" src="/assets/js/convertUtils.js"></script>
-  <script type="text/javascript" src="/assets/js/ajaxUtils.js"></script>
-  <script type="text/javascript" src="/assets/js/uiUtils.js"></script>
-  <script type="text/javascript" src="/assets/js/globals.js"></script>
-  <script type="text/javascript" src="/assets/js/uis.js"></script>
-  <script type="text/javascript" src="/assets/js/handlers.js"></script>
-  <script type="text/javascript" src="/assets/js/main.js"></script>
+  <link rel="stylesheet" href="/statics/bootstrap-5.3.3/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="/statics/bootstrap-icons-1.11.3/font/bootstrap-icons.min.css">
+  <script type="module" src="/statics/js/mustacheUtils.js"></script>
+  <script type="text/javascript" src="/statics/js/configs/logUtils/configs.js"></script>
+  <script type="text/javascript" src="/statics/js/logUtils.js"></script>
+  <script type="text/javascript" src="/statics/js/convertUtils.js"></script>
+  <script type="text/javascript" src="/statics/js/ajaxUtils.js"></script>
+  <script type="text/javascript" src="/statics/js/uiUtils.js"></script>
+  <script type="text/javascript" src="/statics/js/globals.js"></script>
+  <script type="text/javascript" src="/statics/js/handlers.js"></script>
+  <script type="text/javascript" src="/statics/js/main.js"></script>
   <title>pdfprint</title>
 </head>
-<body>
-  <div>
-    <input id="file-input" class="margin-right" name="file" type="file" accept="application/pdf" multiple onchange="handlers.fileInputOnChange(event)">
-    <button id="crea-unico-pdf-button" class="margin-right" onclick="handlers.creaUnicoPdfButtonOnClick(event)">Crea unico pdf</button>
-    <button id="crea-fronte-retro-button" class="margin-right" onclick="handlers.creaFronteRetroButtonOnClick(event)">Crea fronte/retro</button>
-    <button onclick="handlers.chiudiButtonOnClick(event)">Chiudi</button>
+<body class="d-flex flex-row" style="height: 100vh;">
+  <div class="d-flex flex-column p-3" style="flex: 1;">
+    <div class="text-nowrap">
+      <button id="crea-unico-pdf-button" type="button" class="btn btn-primary text-nowrap" onclick="handlers.creaUnicoPdfButtonOnClick(event)">Crea unico pdf</button>
+      <button id="crea-fronte-retro-button" type="button" class="btn btn-primary text-nowrap ms-1" onclick="handlers.creaFronteRetroButtonOnClick(event)">Crea fronte/retro</button>
+      <button type="button" class="btn btn-danger text-nowrap ms-1" onclick="handlers.chiudiButtonOnClick(event)">Chiudi</button>
+    </div>
+    <div class="mt-5">
+      <form>
+        <input id="file-input" name="file" type="file" class="form-control" accept="application/pdf" multiple onchange="handlers.fileInputOnChange(event)">
+      </form>
+    </div>
+    <div class="mt-5">
+      <ol id="file-ol" class="list-group list-group-numbered"></ol>
+    </div>
   </div>
-  <div class="margin-top">
-    <ul id="file-ul"></ul>
+  <div class="d-flex flex-column" style="flex: 1.5;">
+    <ul class="nav nav-underline justify-content-center p-1">
+      <li id="unico-pdf-nav-item" class="nav-item">
+        <button id="unico-pdf-tab-button" type="button" class="nav-link active" data-bs-toggle="tab" data-bs-target="#unico-pdf-tab-pane">Unico Pdf</a>
+      </li>
+      <li id="fronte-nav-item" class="nav-item" hidden>
+        <button id="fronte-tab-button" type="button" class="nav-link" data-bs-toggle="tab" data-bs-target="#fronte-tab-pane">Fronte</a>
+      </li>
+      <li id="retro-nav-item" class="nav-item" hidden>
+        <button type="button" class="nav-link" data-bs-toggle="tab" data-bs-target="#retro-tab-pane">Retro</a>
+      </li>
+    </ul>
+    <div class="tab-content d-flex flex-column" style="flex: 1;">
+      <div id="unico-pdf-tab-pane" class="tab-pane fade w-100 h-100 active show"></div>
+      <div id="fronte-tab-pane" class="tab-pane w-100 h-100 fade"></div>
+      <div id="retro-tab-pane" class="tab-pane w-100 h-100 fade"></div>
+    </div>
   </div>
+
+
+
+  <template id="file-li-template">
+    <li class="list-group-item d-flex">
+      <div class="d-flex flex-column ms-1">
+        <button type="button" class="btn btn-primary btn-sm{{#isFirst}} disabled{{/isFirst}}" onclick="handlers.spostaSuButtonOnClick(this, {{index}})">
+          <i class="bi bi-arrow-up"></i>
+        </button>
+        <button type="button" class="btn btn-primary btn-sm mt-1{{#isLast}} disabled{{/isLast}}" onclick="handlers.spostaGiuButtonOnClick(event, {{index}})">
+          <i class="bi bi-arrow-down"></i>
+        </button>
+      </div>
+      <span class="ms-1 me-auto my-auto">{{fileName}}</span>
+      <button type="button" class="btn btn-danger btn-sm ms-1 mb-auto" onclick="handlers.rimuoviButtonOnClick(event, {{index}})">
+        <i class="bi bi-trash"></i>
+      </button>
+    </li>
+  </template>
+
+  <template id="pdf-embed-template">
+    <div class="d-flex flex-column w-100 h-100">
+      <embed type="application/pdf" src="{{src}}" class="d-flex" style="flex: 1;">
+    </div>
+  </template>
+
+
+
+  <script src="/statics/bootstrap-5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

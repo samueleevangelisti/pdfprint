@@ -1,9 +1,9 @@
 '''
 sync.py
 '''
-import os
+from utils import commands
 
 
 
-os.system('git checkout master')
-os.system('git pull')
+commands.run('git checkout master', True)
+commands.run('git pull', True)

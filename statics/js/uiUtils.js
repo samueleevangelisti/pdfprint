@@ -443,6 +443,11 @@ var uiUtils = (() => {
       });
       return element;
     },
+    elementFromHtml: (html) => {
+      let element = document.createElement('div');
+      element.innerHTML = html;
+      return element.children[0];
+    },
     Button: Button,
     Input: Input,
     Select: Select,
