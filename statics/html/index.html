@@ -5,75 +5,130 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="/statics/bootstrap-5.3.3/dist/css/bootstrap.min.css">
   <link rel="stylesheet" href="/statics/bootstrap-icons-1.11.3/font/bootstrap-icons.min.css">
-  <script type="module" src="/statics/js/mustacheUtils.js"></script>
-  <script type="text/javascript" src="/statics/js/configs/logUtils/configs.js"></script>
-  <script type="text/javascript" src="/statics/js/logUtils.js"></script>
+  <script type="module" src="/statics/js/mustacheModule.js"></script>
+  <script type="module" src="/statics/js/logModule.js"></script>
   <script type="text/javascript" src="/statics/js/convertUtils.js"></script>
-  <script type="text/javascript" src="/statics/js/ajaxUtils.js"></script>
-  <script type="text/javascript" src="/statics/js/uiUtils.js"></script>
+  <script type="module" src="/statics/js/ajaxModule.js"></script>
+  <script type="module" src="/statics/js/bootstrapModule.js"></script>
+  <script type="text/javascript" src="/statics/js/classes.js"></script>
   <script type="text/javascript" src="/statics/js/globals.js"></script>
   <script type="text/javascript" src="/statics/js/handlers.js"></script>
   <script type="text/javascript" src="/statics/js/main.js"></script>
+  <script type="text/javascript" src="/statics/js/uis.js"></script>
   <title>pdfprint</title>
 </head>
 <body class="d-flex flex-row" style="height: 100vh;">
-  <div class="d-flex flex-column p-3" style="flex: 1;">
-    <div class="text-nowrap">
-      <button id="crea-unico-pdf-button" type="button" class="btn btn-primary text-nowrap" onclick="handlers.creaUnicoPdfButtonOnClick(event)">Crea unico pdf</button>
-      <button id="crea-fronte-retro-button" type="button" class="btn btn-primary text-nowrap ms-1" onclick="handlers.creaFronteRetroButtonOnClick(event)">Crea fronte/retro</button>
-      <button type="button" class="btn btn-danger text-nowrap ms-1" onclick="handlers.chiudiButtonOnClick(event)">Chiudi</button>
-    </div>
-    <div class="mt-5">
-      <form>
-        <input id="file-input" name="file" type="file" class="form-control" accept="application/pdf" multiple onchange="handlers.fileInputOnChange(event)">
-      </form>
-    </div>
-    <div class="mt-5">
-      <ol id="file-ol" class="list-group list-group-numbered"></ol>
-    </div>
+  <div class="d-flex flex-column mx-3 mt-3" style="flex: 1;">
+    <button type="button" class="btn btn-danger ms-auto" onclick="chiudiButtonOnClick(event)">Chiudi</button>
+    <input id="file-input" name="file" type="file" class="form-control mt-5" accept="application/pdf" multiple onchange="handlers.fileInputOnChange(event)">
+    <div id="file-ol-div" class="overflow-y-scroll mt-5 pe-2" style="flex: 1;"></div>
   </div>
-  <div class="d-flex flex-column" style="flex: 1.5;">
-    <ul class="nav nav-underline justify-content-center p-1">
-      <li id="unico-pdf-nav-item" class="nav-item">
-        <button id="unico-pdf-tab-button" type="button" class="nav-link active" data-bs-toggle="tab" data-bs-target="#unico-pdf-tab-pane">Unico Pdf</a>
-      </li>
-      <li id="fronte-nav-item" class="nav-item" hidden>
-        <button id="fronte-tab-button" type="button" class="nav-link" data-bs-toggle="tab" data-bs-target="#fronte-tab-pane">Fronte</a>
-      </li>
-      <li id="retro-nav-item" class="nav-item" hidden>
-        <button type="button" class="nav-link" data-bs-toggle="tab" data-bs-target="#retro-tab-pane">Retro</a>
-      </li>
-    </ul>
-    <div class="tab-content d-flex flex-column" style="flex: 1;">
-      <div id="unico-pdf-tab-pane" class="tab-pane fade w-100 h-100 active show"></div>
-      <div id="fronte-tab-pane" class="tab-pane w-100 h-100 fade"></div>
-      <div id="retro-tab-pane" class="tab-pane w-100 h-100 fade"></div>
-    </div>
-  </div>
-
-
-
-  <template id="file-li-template">
-    <li class="list-group-item d-flex">
-      <div class="d-flex flex-column ms-1">
-        <button type="button" class="btn btn-primary btn-sm{{#isFirst}} disabled{{/isFirst}}" onclick="handlers.spostaSuButtonOnClick(this, {{index}})">
-          <i class="bi bi-arrow-up"></i>
+  <div class="d-flex flex-column m-3" style="flex: 1;">
+    <!-- TODO DSE nelle carte bisogna metterci i messaggi che indicano all'utente lo stato della generazione dei pdf -->
+    <div class="card mb-3">
+      <div class="card-header text-nowrap">
+        Unico PDF
+      </div>
+      <div class="card-body text-nowrap">
+        <button id="create-unique-pdf-button" type="button" class="btn btn-primary me-3" onclick="handlers.createUniquePdfButtonOnClick(event)">
+          <i class="bi bi-gear"></i>
+          Crea PDF
         </button>
-        <button type="button" class="btn btn-primary btn-sm mt-1{{#isLast}} disabled{{/isLast}}" onclick="handlers.spostaGiuButtonOnClick(event, {{index}})">
-          <i class="bi bi-arrow-down"></i>
+        <button id="view-unique-pdf-button" type="button" class="btn btn-primary me-3" onclick="handlers.viewUniquePdfButtonOnClick(event)" disabled>
+          <i class="bi bi-file-earmark-pdf"></i>
+          Visualizza
+        </button>
+        <button id="download-unique-pdf-button" type="button" class="btn btn-primary" onclick="handlers.downloadUniquePdfButtonOnClick(event)" disabled>
+          <i class="bi bi-download"></i>
+          Scarica
         </button>
       </div>
-      <span class="ms-1 me-auto my-auto">{{fileName}}</span>
-      <button type="button" class="btn btn-danger btn-sm ms-1 mb-auto" onclick="handlers.rimuoviButtonOnClick(event, {{index}})">
-        <i class="bi bi-trash"></i>
-      </button>
-    </li>
-  </template>
-
-  <template id="pdf-embed-template">
-    <div class="d-flex flex-column w-100 h-100">
-      <embed type="application/pdf" src="{{src}}" class="d-flex" style="flex: 1;">
     </div>
+    <div class="card">
+      <div class="card-header text-nowrap">
+        Fronte - Retro
+      </div>
+      <div class="card-body text-nowrap">
+        <button id="create-front-back-button" type="button" class="btn btn-primary me-3" onclick="handlers.createFrontBackButtonOnClick(event)">
+          <i class="bi bi-gear"></i>
+          Crea PDF
+        </button>
+        <button id="view-front-back-button" type="button" class="btn btn-primary dropdown-toggle me-3" data-bs-toggle="dropdown" disabled>
+          <i class="bi bi-file-earmark-pdf"></i>
+          Visualizza
+        </button>
+        <ul class="dropdown-menu">
+          <li><a class="dropdown-item" onclick="handlers.viewFrontButtonOnClick(event)">Fronte</a></li>
+          <li><a class="dropdown-item" onclick="handlers.viewBackButtonOnClick(event)">Retro</a></li>
+        </ul>
+        <button id="download-front-back-button" type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" disabled>
+          <i class="bi bi-download"></i>
+          Scarica
+        </button>
+        <ul class="dropdown-menu">
+          <li><a class="dropdown-item" onclick="handlers.downloadFrontButtonOnClick(event)">Fronte</a></li>
+          <li><a class="dropdown-item" onclick="handlers.downloadBackButtonOnClick(event)">Retro</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+
+
+  <template id="file-ol-template">
+    <ol id="file-ol" class="list-group list-group-numbered">
+      {{#.}}
+      <li class="list-group-item d-flex">
+        <div class="d-flex flex-column mx-3 my-auto">
+          {{#isFirst}}
+          <button type="button" class="btn btn-primary btn-sm" disabled>
+            <i class="bi bi-arrow-up"></i>
+          </button>
+          {{/isFirst}}
+          {{^isFirst}}
+          <button type="button" class="btn btn-primary btn-sm" onclick="handlers.spostaSuButtonOnClick(event)">
+            <i class="bi bi-arrow-up"></i>
+          </button>
+          {{/isFirst}}
+          {{#isLast}}
+          <button type="button" class="btn btn-primary btn-sm mt-2" disabled>
+            <i class="bi bi-arrow-down"></i>
+          </button>
+          {{/isLast}}
+          {{^isLast}}
+          <button type="button" class="btn btn-primary btn-sm mt-2" onclick="handlers.spostaGiuButtonOnClick(event)">
+            <i class="bi bi-arrow-down"></i>
+          </button>
+          {{/isLast}}
+        </div>
+        <div class="me-3">
+          <div>{{fileName}}</div>
+          <div style="display: flex; flex-direction: row;">
+            <div class="me-3 my-auto">
+              {{#isAllPages}}
+              <input type="checkbox" class="form-check-input" checked onchange="handlers.allPagesCheckboxOnChange(event)">
+              {{/isAllPages}}
+              {{^isAllPages}}
+              <input type="checkbox" class="form-check-input" onchange="handlers.allPagesCheckboxOnChange(event)">
+              {{/isAllPages}}
+              <label class="form-check-label">Tutte le pagine</label>
+            </div>
+            <div class="me-3">
+              <label class="form-label">Inizio</label>
+              <input type="number" class="form-control" value="{{firstPage}}" disabled>
+            </div>
+            <div>
+              <label class="form-label">Fine</label>
+              <input type="number" class="form-control" value="{{lastPage}}" disabled>
+            </div>
+          </div>
+        </div>
+        <button type="button" class="btn btn-danger btn-sm ms-auto mb-auto" onclick="handlers.rimuoviButtonOnClick(event)">
+          <i class="bi bi-trash"></i>
+        </button>
+      </li>
+      {{/.}}
+    </ol>
   </template>
 
 

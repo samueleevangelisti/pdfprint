@@ -1,5 +1,14 @@
 var globals = {
-  fileArr: [],
+  pdfFileArr: [],
+  uniquePdfBase64: null,
+  frontBackBase64: {
+    front: null,
+    back: null
+  },
+  frontBackDownloadDate: null,
   fileForm: null,
-  fileArrUl: null
+  viewUniquePdfButton: null,
+  downloadUniquePdfButton: null,
+  viewFrontBackButton: null,
+  downloadFrontBackButton: null
 };

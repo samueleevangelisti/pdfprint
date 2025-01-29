@@ -1,5 +1,4 @@
 '''
-logs.py
 This module is from samueva97.
 Do not modify it
 '''
@@ -10,7 +9,7 @@ from logging.handlers import TimedRotatingFileHandler
 import os
 import inspect
 
-import environments
+from utils.configs.logs import configs
 from utils import colors
 from utils import paths
 from utils import datetimes
@@ -37,6 +36,7 @@ class CustomTimedRotatingFileHandler(TimedRotatingFileHandler):
 
 
 
+    # pylint: disable-next=unused-argument
     def namer(self, file_name):
         '''
         Overrides
@@ -57,7 +57,7 @@ class CustomTimedRotatingFileHandler(TimedRotatingFileHandler):
             os.rename(source, dest)
             with open(dest, 'rb') as source_file:
                 with open(f"{dest}.zstd", 'wb') as destination_file:
-                    destination_file.write(converts.byte_to_zstd(source_file.read()))
+                    destination_file.write(converts.bytes_to_zstd(source_file.read()))
             os.remove(dest)
 
 
@@ -127,11 +127,12 @@ _LOG_RECORD_FACTORY = logging.getLogRecordFactory()
 
 
 
+# pylint: disable-next=missing-function-docstring
 def custom_log_record_factory(*args, **kwargs):
     record = _LOG_RECORD_FACTORY(*args, **kwargs)
     stack = inspect.stack()[6]
     record.funcName = stack.function
-    record.module = inspect.getmodulename(stack.filename)
+    record.module = str(inspect.getmodulename(stack.filename))
     return record
 
 
@@ -144,17 +145,18 @@ logging.addLevelName(_SUCCESS, 'SUCCESS')
 
 
 _LOGGER = logging.getLogger()
-_LOGGER.setLevel(logging.DEBUG if environments.IS_DEVELOPMENT else logging.INFO)
+_LOGGER.setLevel(logging.DEBUG if configs.IS_DEBUG else logging.INFO)
 custom_formatter = CustomFormatter()
 console_handler = StreamHandler()
 console_handler.setFormatter(custom_formatter)
 _LOGGER.addHandler(console_handler)
-if environments.IS_LOG_FILE:
-    if not paths.is_entry(environments.LOG_FOLDER_PATH):
-        os.makedirs(environments.LOG_FOLDER_PATH)
-    elif not paths.is_folder(environments.LOG_FOLDER_PATH):
-        raise Exception(f"`{environments.LOG_FOLDER_PATH}` is not a folder")
-    file_handler = CustomTimedRotatingFileHandler(paths.resolve_path(environments.LOG_FOLDER_PATH, 'log.log'), when='midnight')
+if configs.IS_LOG_FILE:
+    if not paths.is_entry(configs.LOG_FOLDER_PATH):
+        os.makedirs(configs.LOG_FOLDER_PATH)
+    elif not paths.is_folder(configs.LOG_FOLDER_PATH):
+        # pylint: disable-next=broad-exception-raised
+        raise Exception(f"`{configs.LOG_FOLDER_PATH}` is not a folder")
+    file_handler = CustomTimedRotatingFileHandler(paths.resolve_path(configs.LOG_FOLDER_PATH, 'log.log'), when='midnight')
     file_handler.setFormatter(custom_formatter)
     _LOGGER.addHandler(file_handler)
 
@@ -162,7 +164,12 @@ if environments.IS_LOG_FILE:
 
 def debug(text):
     '''
-    debug(text)
+    Print a debug log
+    
+    Parameters
+    ----------
+    text : str
+        Text of the log
     '''
     logging.debug(text)
 
@@ -170,7 +177,12 @@ def debug(text):
 
 def query(text):
     '''
-    query(text)
+    Print a query log
+    
+    Parameters
+    ----------
+    text : str
+        Text of the log
     '''
     logging.log(_QUERY, text)
 
@@ -178,7 +190,12 @@ def query(text):
 
 def request(text):
     '''
-    request(text)
+    Print a request log
+    
+    Parameters
+    ----------
+    text : str
+        Text of the log
     '''
     logging.log(_REQUEST, text)
 
@@ -186,7 +203,12 @@ def request(text):
 
 def info(text):
     '''
-    info(text)
+    Print an info log
+    
+    Parameters
+    ----------
+    text : str
+        Text of the log
     '''
     logging.info(text)
 
@@ -194,7 +216,12 @@ def info(text):
 
 def success(text):
     '''
-    success(text)
+    Print a success log
+    
+    Parameters
+    ----------
+    text : str
+        Text of the log
     '''
     logging.log(_SUCCESS, text)
 
@@ -202,7 +229,12 @@ def success(text):
 
 def warning(text):
     '''
-    warning(text)
+    Print a warning log
+    
+    Parameters
+    ----------
+    text : str
+        Text of the log
     '''
     logging.warning(text)
 
@@ -210,7 +242,12 @@ def warning(text):
 
 def error(text):
     '''
-    error(text)
+    Print an error log
+    
+    Parameters
+    ----------
+    text : str
+        Text of the log
     '''
     logging.error(text)
 
@@ -218,7 +255,12 @@ def error(text):
 
 def critical(text):
     '''
-    critical(text)
+    Print a critical log
+    
+    Parameters
+    ----------
+    text : str
+        Text of the log
     '''
     logging.critical(text)
 
@@ -226,6 +268,11 @@ def critical(text):
 
 def exception(text):
     '''
-    error(text)
+    Print an exception log
+    
+    Parameters
+    ----------
+    text : str
+        Text of the log
     '''
     logging.exception(text)

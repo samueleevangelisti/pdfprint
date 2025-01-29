@@ -1,4 +1,12 @@
-var uiUtils = (() => {
+/*
+This module is from samueva97.
+Do not modify it
+*/
+import '/statics/js/logModule.js';
+
+
+
+window.uiUtils = (() => {
 
 
 
@@ -197,23 +205,23 @@ var uiUtils = (() => {
 
 
 
-    static fromElementId(elementId, configObj={}) {
+    static fromElementId(elementId, configsObj={}) {
       logUtils.debug('(uiUtils.Select.fromElementId)', {
         elementId: elementId,
-        configObj: configObj
+        configsObj: configsObj
       });
-      return new Select(document.getElementById(elementId), configObj);
+      return new Select(document.getElementById(elementId), configsObj);
     }
 
 
 
-    constructor(element, configObj={}) {
+    constructor(element, configsObj={}) {
       logUtils.debug('(uiUtils.Select.constructor)', {
         element: element,
-        configObj: configObj
+        configsObj: configsObj
       });
       super(element);
-      this.type = element.dataset.uiUtilsType || configObj.type || null;
+      this.type = element.dataset.uiUtilsType || configsObj.type || null;
     }
 
 
@@ -324,9 +332,9 @@ var uiUtils = (() => {
       logUtils.debug('(uiUtils.Form.isValid) get', {
         form: this
       });
-      return Object.values(this.formObj).reduce((result, uiElementInput) => {
-        return result && uiElementInput.isValid;
-      }, true);
+      return Object.values(this.formObj).every((uiElementInput) => {
+        return uiElementInput.isValid;
+      });
     }
 
 
@@ -411,24 +419,29 @@ var uiUtils = (() => {
 
 
   return {
-    elementFromConfigObj: (configObj) => {
-      let tag = configObj.tag;
-      let classArr = configObj.classArr || [];
-      let attributeObj = configObj.attributeObj || {};
-      let styleObj = configObj.styleObj || {};
-      let handlerFnObj = configObj.handlerFnObj || {};
-      let childElementArr = configObj.childElementArr || [];
-      delete configObj.tag;
-      delete configObj.classArr;
-      delete configObj.attributeObj;
-      delete configObj.styleObj;
-      delete configObj.handlerFnObj;
-      delete configObj.childElementArr;
+    elementFromConfigsObj: (configsObj) => {
+      let tag = configsObj.tag;
+      let classArr = configsObj.classArr || [];
+      let datasetObj = configsObj.datasetObj || {};
+      let attributeObj = configsObj.attributeObj || {};
+      let styleObj = configsObj.styleObj || {};
+      let handlerFnObj = configsObj.handlerFnObj || {};
+      let childElementArr = configsObj.childElementArr || [];
+      delete configsObj.tag;
+      delete configsObj.classArr;
+      delete configsObj.datasetObj;
+      delete configsObj.attributeObj;
+      delete configsObj.styleObj;
+      delete configsObj.handlerFnObj;
+      delete configsObj.childElementArr;
       let element = document.createElement(tag);
-      Object.entries(configObj).forEach(([key, value]) => {
+      Object.entries(configsObj).forEach(([key, value]) => {
         element[key] = value;
       });
       element.classList.add(...classArr);
+      Object.entries(datasetObj).forEach(([key, value]) => {
+        element.dataset[key] = value;
+      });
       Object.entries(attributeObj).forEach(([attribute, value]) => {
         element.setAttribute(attribute, value);
       });

@@ -20,7 +20,7 @@ var convertUtils = {
       name: name,
       type: type
     });
-    uiUtils.elementFromConfigObj({
+    uiUtils.elementFromConfigsObj({
       tag: 'a',
       href: `data:${type};base64,${base64}`,
       download: name

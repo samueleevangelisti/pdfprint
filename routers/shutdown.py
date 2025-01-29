@@ -1,18 +1,17 @@
 '''
-shutdown.py
 This module is from samueva97.
 Do not modify it
 '''
 from threading import Thread
 import time
-import flask
+from flask import Blueprint
 
 from utils import logs
 from utils import processes
 
 
 
-router = flask.Blueprint('shutdown', __name__)
+router = Blueprint('shutdown', __name__)
 
 
 

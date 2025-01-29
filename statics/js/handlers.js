@@ -7,204 +7,221 @@ var handlers = {
       event: event
     });
     globals.fileForm.disable();
-    globals.fileArr = globals.fileArr.concat(Array.from(event.target.files));
-    event.target.value = null;
-    globals.fileArrUl.loadLiArr(globals.fileArr.map((file, index) => {
-      return new uiUtils.Li(uiUtils.elementFromHtml(mustache.render(document.getElementById('file-li-template').innerHTML, {
-        index: index,
-        isFirst: index == 0,
-        isLast: index == globals.fileArr.length - 1,
-        fileName: file.name
-      })));
+    globals.uniquePdfBase64 = null;
+    globals.frontBackBase64.front = null;
+    globals.frontBackBase64.back = null;
+    globals.frontBackDownloadDate = null;
+    // TODO DSE le utils dell'interfaccia dovrebbero poter leggere correttamente anche i file come input
+    globals.pdfFileArr.push(...Array.from(event.target.files).map((file) => {
+      return new PdfFile(file, true, null, null);
     }));
+    event.target.value = null;
+    uis.refresh();
     globals.fileForm.enable();
   },
 
 
 
-  creaUnicoPdfButtonOnClick: (event) => {
-    logUtils.debug('(handlers.creaUnicoPdfButtonOnClick)', {
+  _spostaButtonOnClick: (event, delta) => {
+    logUtils.debug('(handlers._spostaButtonOnClick)', {
+      event: event,
+      delta: delta
+    });
+    globals.uniquePdfBase64 = null;
+    globals.frontBackBase64.front = null;
+    globals.frontBackBase64.back = null;
+    globals.frontBackDownloadDate = null;
+    let index = Array.from(event.target.closest('ol').children).indexOf(event.target.closest('li'));
+    globals.pdfFileArr.splice(index + delta, 0, globals.pdfFileArr.splice(index, 1)[0]);
+    uis.refresh();
+  },
+
+
+
+  spostaSuButtonOnClick: (event) => {
+    logUtils.debug('(handlers.spostaSuButtonOnClick)', {
+      event: event
+    });
+    handlers._spostaButtonOnClick(event, -1);
+  },
+
+
+
+  spostaGiuButtonOnClick: (event) => {
+    logUtils.debug('(handlers.spostaGiuButtonOnClick)', {
+      event: event
+    });
+    handlers._spostaButtonOnClick(event, 1);
+  },
+
+
+
+  allPagesCheckboxOnChange: (event) => {
+    logUtils.debug('(handlers.allPagesCheckboxOnChange)');
+    // TODO DSE qui bisogna metterci la funzione corretta
+  },
+
+
+
+  rimuoviButtonOnClick: (event) => {
+    logUtils.debug('(handlers.rimuoviButtonOnClick)', {
+      event: event
+    });
+    globals.uniquePdfBase64 = null;
+    globals.frontBackBase64.front = null;
+    globals.frontBackBase64.back = null;
+    globals.frontBackDownloadDate = null;
+    globals.pdfFileArr.splice(Array.from(event.target.closest('ol').children).indexOf(event.target.closest('li')), 1);
+    uis.refresh();
+  },
+
+
+
+  createUniquePdfButtonOnClick: (event) => {
+    logUtils.debug('(handlers.createUniquePdfButtonOnClick)', {
       event: event
     });
     globals.fileForm.disable();
-    document.getElementById('unico-pdf-nav-item').hidden = false;
-    document.getElementById('fronte-nav-item').hidden = true;
-    document.getElementById('retro-nav-item').hidden = true;
-    let unicoPdfTabPaneElement = document.getElementById('unico-pdf-tab-pane');
-    unicoPdfTabPaneElement.innerHTML = '';
-    document.getElementById('fronte-tab-pane').innerHTML = '';
-    document.getElementById('retro-tab-pane').innerHTML = '';
-    new bootstrap.Tab(document.getElementById('unico-pdf-tab-button')).show();
-    Promise.all(globals.fileArr.map((file) => {
-      return convertUtils.fileToBase64(file);
+    Promise.all(globals.pdfFileArr.map((pdfFile) => {
+      return convertUtils.fileToBase64(pdfFile.file);
     })).then((responseArr) => {
-      logUtils.debug('(handlers.creaUnicoPdfButtonOnClick)', {
+      logUtils.debug('(handlers.createUniquePdfButtonOnClick)', {
         responseArr: responseArr
       });
       ajaxUtils.post('/merge', responseArr).then((response) => {
         if(!response.success) {
-          logUtils.error('(handlers.creaUnicoPdfButtonOnClick)', {
+          logUtils.error('(handlers.createUniquePdfButtonOnClick)', {
             response: response
           });
-          alert(JSON.stringify(response, null, 2));
+          alert(response.error_str);
           return;
         }
-        logUtils.debug('(handlers.creaUnicoPdfButtonOnClick)', {
+        logUtils.debug('(handlers.createUniquePdfButtonOnClick)', {
           response: response
         });
-        unicoPdfTabPaneElement.append(uiUtils.elementFromHtml(mustache.render(document.getElementById('pdf-embed-template').innerHTML, {
-          src: `data:application/pdf;base64,${response.data}#zoom=100`
-        })));
+        globals.uniquePdfBase64 = response.data;
       }).catch((error) => {
-        logUtils.error('(handlers.creaUnicoPdfButtonOnClick)', {
+        logUtils.error('(handlers.createUniquePdfButtonOnClick)', {
           error: error
         });
-        alert(JSON.stringify(error, null, 2));
+        alert(error.toString());
+      }).finally(() => {
+        logUtils.debug('(handlers.createUniquePdfButtonOnClick)');
+        uis.refreshButtons();
+        globals.fileForm.enable();
       });
     }).catch((error) => {
-      logUtils.error('(handlers.creaUnicoPdfButtonOnClick)', {
+      logUtils.error('(handlers.createUniquePdfButtonOnClick)', {
         error: error
       });
-      alert(JSON.stringify(error, null, 2));
-    }).finally(() => {
+      alert(error.toString());
+      uis.refreshButtons();
       globals.fileForm.enable();
     });
   },
 
 
 
-  creaFronteRetroButtonOnClick: (event) => {
-    logUtils.debug('(handlers.creaFronteRetroButtonOnClick)', {
+  viewUniquePdfButtonOnClick: (event) => {
+    logUtils.debug('(viewUniquePdfButtonOnClick)', {
+      event: event
+    });
+    alert('Funzionalità non supportata');
+  },
+
+
+
+  downloadUniquePdfButtonOnClick: (event) => {
+    logUtils.debug('(handlers.downloadUniquePdfButtonOnClick)', {
+      event: event
+    });
+    convertUtils.base64ToPdf(globals.uniquePdfBase64, `documento_${new Date().toISOString()}.pdf`);
+  },
+
+
+
+  createFrontBackButtonOnClick: (event) => {
+    logUtils.debug('(handlers.createFrontBackButtonOnClick)', {
       event: event
     });
     globals.fileForm.disable();
-    document.getElementById('unico-pdf-nav-item').hidden = true;
-    document.getElementById('fronte-nav-item').hidden = false;
-    document.getElementById('retro-nav-item').hidden = false;
-    document.getElementById('unico-pdf-tab-pane').innerHTML = '';
-    let fronteTabPaneElement = document.getElementById('fronte-tab-pane');
-    fronteTabPaneElement.innerHTML = '';
-    let retroTabPaneElement = document.getElementById('retro-tab-pane');
-    retroTabPaneElement.innerHTML = '';
-    new bootstrap.Tab(document.getElementById('fronte-tab-button')).show();
-    Promise.all(globals.fileArr.map((file) => {
-      return convertUtils.fileToBase64(file);
+    Promise.all(globals.pdfFileArr.map((pdfFile) => {
+      return convertUtils.fileToBase64(pdfFile.file);
     })).then((responseArr) => {
-      logUtils.debug('(handlers.creaFronteRetroButtonOnClick)', {
+      logUtils.debug('(handlers.createFrontBackButtonOnClick)', {
         responseArr: responseArr
       });
       ajaxUtils.post('/split', responseArr).then((response) => {
         if(!response.success) {
-          logUtils.error('(handlers.creaFronteRetroButtonOnClick)', {
+          logUtils.error('(handlers.createFrontBackButtonOnClick)', {
             response: response
           });
-          alert(JSON.stringify(response, null, 2));
+          alert(response.error_str);
           return;
         }
-        logUtils.debug('(handlers.creaFronteRetroButtonOnClick)', {
+        logUtils.debug('(handlers.createFrontBackButtonOnClick)', {
           response: response
         });
-        fronteTabPaneElement.append(uiUtils.elementFromHtml(mustache.render(document.getElementById('pdf-embed-template').innerHTML, {
-          src: `data:application/pdf;base64,${response.data.fronte}#zoom=100`
-        })));
-        retroTabPaneElement.append(uiUtils.elementFromHtml(mustache.render(document.getElementById('pdf-embed-template').innerHTML, {
-          src: `data:application/pdf;base64,${response.data.retro}#zoom=100`
-        })));
+        globals.frontBackBase64.front = response.data.front;
+        globals.frontBackBase64.back = response.data.back;
       }).catch((error) => {
-        logUtils.debug('(handlers.creaFronteRetroButtonOnClick)', {
+        logUtils.debug('(handlers.createFrontBackButtonOnClick)', {
           error: error
         });
-        alert(JSON.stringify(error, null, 2));
+        alert(error.toString());
+      }).finally(() => {
+        logUtils.debug('(handlers.createFrontBackButtonOnClick)');
+        uis.refreshButtons();
+        globals.fileForm.enable();
       });
     }).catch((error) => {
-      logUtils.error('(handlers.creaFronteRetroButtonOnClick)', {
+      logUtils.error('(handlers.createFrontBackButtonOnClick)', {
         error: error
       });
-      alert(JSON.stringify(error, null, 2));
-    }).finally(() => {
+      alert(error.toString());
+      uis.refreshButtons();
       globals.fileForm.enable();
     });
   },
 
 
 
-  chiudiButtonOnClick: (event) => {
-    logUtils.debug('(handlers.chiudiButtonOnClick)', {
+  viewFrontButtonOnClick: (event) => {
+    logUtils.debug('(viewFrontButtonOnClick)', {
       event: event
     });
-    ajaxUtils.post('/shutdown').then((response) => {
-      if(!response.success) {
-        logUtils.error('(handlers.chiudiButtonOnClick)', {
-          response: response
-        });
-        alert(JSON.stringify(response, null, 2));
-        return;
-      }
-      logUtils.debug('(handlers.chiudiButtonOnClick)', {
-        response: response
-      });
-      window.close();
-    }).catch((error) => {
-      logUtils.error('(handlers.chiudiButtonOnClick)', {
-        error: error
-      });
-      alert(JSON.stringify(error, null, 2));
-    });
+    alert('Funzionalità non supportata');
   },
 
 
 
-  _spostaButtonOnClick: (index, delta) => {
-    logUtils.debug('(handlers._spostaButtonOnClick)', {
-      index: index,
-      delta: delta
+  viewBackButtonOnClick: (event) => {
+    logUtils.debug('(viewBackButtonOnClick)', {
+      event: event
     });
-    globals.fileArr.splice(index + delta, 0, globals.fileArr.splice(index, 1)[0]);
-    globals.fileArrUl.loadLiArr(globals.fileArr.map((file, index) => {
-      return new uiUtils.Li(uiUtils.elementFromHtml(mustache.render(document.getElementById('file-li-template').innerHTML, {
-        index: index,
-        isFirst: index == 0,
-        isLast: index == globals.fileArr.length - 1,
-        fileName: file.name
-      })));
-    }));
+    alert('Funzionalità non supportata');
   },
 
 
 
-  spostaSuButtonOnClick: (event, index) => {
-    logUtils.debug('(handlers.spostaSuButtonOnClick)', {
-      event: event,
-      index: index
+  downloadFrontButtonOnClick: (event) => {
+    logUtils.debug('(handlers.downloadFrontButtonOnClick)', {
+      event: event
     });
-    handlers._spostaButtonOnClick(index, -1);
+    globals.frontBackDownloadDate = globals.frontBackDownloadDate || new Date();
+    convertUtils.base64ToPdf(globals.frontBackBase64.front, `fronte_${(globals.pdfFileArr.length == 1 ? globals.pdfFileArr[0].file.name.split('.').slice(0, -1).join('.') : globals.frontBackDownloadDate.toISOString())}.pdf`);
   },
 
 
 
-  spostaGiuButtonOnClick: (event, index) => {
-    logUtils.debug('(handlers.spostaGiuButtonOnClick)', {
-      event: event,
-      index: index
+  downloadBackButtonOnClick: (event) => {
+    logUtils.debug('(handlers.downloadBackButtonOnClick)', {
+      event: event
     });
-    handlers._spostaButtonOnClick(index, 1);
-  },
-
-
-
-  rimuoviButtonOnClick: (event, index) => {
-    logUtils.debug('(handlers.rimuoviButtonOnClick)', {
-      event: event,
-      index: index
-    });
-    globals.fileArr.splice(index, 1);
-    globals.fileArrUl.loadLiArr(globals.fileArr.map((file, index) => {
-      return new uiUtils.Li(uiUtils.elementFromHtml(mustache.render(document.getElementById('file-li-template').innerHTML, {
-        index: index,
-        isFirst: index == 0,
-        isLast: index == globals.fileArr.length - 1,
-        fileName: file.name
-      })));
-    }));
+    globals.frontBackDownloadDate = globals.frontBackDownloadDate || new Date();
+    convertUtils.base64ToPdf(globals.frontBackBase64.back, `retro_${(globals.pdfFileArr.length == 1 ? globals.pdfFileArr[0].file.name.split('.').slice(0, -1).join('.') : globals.frontBackDownloadDate.toISOString())}.pdf`);
   }
+
+
+
 };

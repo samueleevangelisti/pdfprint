@@ -25,7 +25,7 @@ def post_file_list():
     data_list = json.loads(flask.request.data.decode())
     pdf_writer = PdfWriter()
     for data in data_list:
-        pdf_reader = PdfReader(BytesIO(converts.base64_to_byte(data)))
+        pdf_reader = PdfReader(BytesIO(converts.base64_to_bytes(data)))
         for page in pdf_reader.pages:
             pdf_writer.add_page(page)
     bytes_io = BytesIO()
@@ -33,5 +33,5 @@ def post_file_list():
     bytes_io.seek(0)
     return {
         'success': True,
-        'data': converts.byte_to_base64(bytes_io.read())
+        'data': converts.bytes_to_base64(bytes_io.read())
     }
